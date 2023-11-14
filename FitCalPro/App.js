@@ -1,5 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
+import { initializeApp } from "firebase/app";
 import { StyleSheet, Text, View } from 'react-native';
+import app from './firebase';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LoginScreen from './screens/LoginScreen';
@@ -27,3 +29,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
+
