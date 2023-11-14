@@ -21,10 +21,15 @@ const LoginScreen = () => {
         />
         
       </View>
-      <View>
-        <TouchableOpacity onPress={() => {}}>
-
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity onPress={() => { }} style={styles.button}>
+          <Text style={styles.button}>Login</Text>
         </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => { }} style={[styles.button, styles.buttonOutline]}>
+          <Text style={styles.buttonOutlineText}>Register</Text>
+        </TouchableOpacity>
+
       </View>
     </KeyboardAvoidingView>
   )
