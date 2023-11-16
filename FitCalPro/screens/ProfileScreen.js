@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
@@ -21,9 +21,20 @@ const ProfileScreen = () => {
     return unsubscribe;
   }, [navigation]);
 
+  const handleLogout = async () => {
+    const auth = getAuth();
+    try {
+      await signOut(auth);
+      navigation.navigate('Login'); // Navigate to login screen after logout
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Welcome, {user?.email}</Text>
+      <Button title="Logout" onPress={handleLogout} />
     </View>
   );
 };
@@ -37,6 +48,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 18,
     fontWeight: 'bold',
+    marginBottom: 20,
   },
 });
 
