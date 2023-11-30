@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useNavigation } from '@react-navigation/native';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import RegisterScreen from './RegisterScreen';
 
 const Tab = createBottomTabNavigator();
 
@@ -22,14 +23,18 @@ const LoginScreen = () => {
     }
   };
 
-  const handleRegister = async () => {
-    try {
-      const auth = getAuth();
-      await createUserWithEmailAndPassword(auth, email, password);
-      navigation.navigate('HomeTabs'); // Navigate to the tabs after successful registration
-    } catch (error) {
-      console.error(error);
-    }
+  // const handleRegister = async () => {
+  //   try {
+  //     const auth = getAuth();
+  //     await createUserWithEmailAndPassword(auth, email, password);
+  //     navigation.navigate('HomeTabs'); // Navigate to the tabs after successful registration
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
+  const navigateToRegister = () => {
+    navigation.navigate('Register');
   };
 
   return (
@@ -56,8 +61,8 @@ const LoginScreen = () => {
           <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={handleRegister} style={[styles.button, styles.buttonOutline]}>
-          <Text style={styles.buttonOutlineText}>Register</Text>
+        <TouchableOpacity onPress={navigateToRegister} style={[styles.button, styles.buttonOutline]}>
+          <Text style={styles.buttonOutlineText}>New? Register Here</Text>
         </TouchableOpacity>
       </View>
     </View>

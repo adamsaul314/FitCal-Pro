@@ -57,32 +57,47 @@ import WorkoutScreen from './screens/WorkoutScreen';
 import DietScreen from './screens/DietScreen.js';
 import ProfileScreen from './screens/ProfileScreen';
  import app from './firebase';
+import RegisterScreen from './screens/RegisterScreen';
 
 
-const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
-
-const HomeTabs = () => {
-  return (
-    <Tab.Navigator>
-      <Tab.Screen name="Workout" component={WorkoutScreen} />
-      <Tab.Screen name="Diet" component={DietScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
-    </Tab.Navigator>
-  );
-};
-
-export default function App() {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="HomeTabs" component={HomeTabs} options={{ headerShown: false}}/>
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-}
-
+ const Stack = createNativeStackNavigator();
+ const Tab = createBottomTabNavigator();
+ 
+ // WorkoutDetails screen component
+ const WorkoutDetailsScreen = ({ route }) => {
+   const { level, workout } = route.params;
+ 
+   return (
+     <View style={styles.container}>
+       <Text style={styles.heading}>{level}</Text>
+       <Text style={styles.workoutDetails}>{workout} Details</Text>
+     </View>
+   );
+ };
+ 
+ // HomeTabs component with a nested Stack.Navigator for WorkoutDetails
+ const HomeTabs = () => {
+   return (
+     <Tab.Navigator>
+       <Tab.Screen name="Workout" component={WorkoutScreen} options={{ headerShown: false }}/>
+       <Tab.Screen name="Diet" component={DietScreen} />
+       <Tab.Screen name="Profile" component={ProfileScreen} />
+     </Tab.Navigator>
+   );
+ };
+ 
+ export default function App() {
+   return (
+     <NavigationContainer>
+       <Stack.Navigator initialRouteName="Login">
+         <Stack.Screen name="Login" component={LoginScreen} />
+         <Stack.Screen name="Register" component={RegisterScreen} />
+         <Stack.Screen name="HomeTabs" component={HomeTabs} options={{ headerShown: false }} />
+         <Stack.Screen name="WorkoutDetails" component={WorkoutDetailsScreen}  />
+       </Stack.Navigator>
+     </NavigationContainer>
+   );
+ }
 const styles = StyleSheet.create({
   container: {
     flex: 1,
