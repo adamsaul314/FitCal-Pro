@@ -10,13 +10,15 @@ const ScanFoodScreen = () => {
   const [foodData, setFoodData] = useState(null);
 
   const addToDietFunction = (nutritionalInfo) => {
-    // Implement your addToDiet logic here
     console.log('Adding to Diet:', nutritionalInfo);
+    navigation.navigate('DietScreen', {
+      screen: 'DietTab',
+      params: { onAddToDiet: addToDietFunction, nutritionalInfo },
+    });
   };
 
   const addToDiet = ({ carbs, protein, fat, kcal }) => {
     if (navigation) {
-      // Navigate back to DietScreen and pass the nutritionalInfo directly
       navigation.navigate('DietScreen', {
         screen: 'DietTab',
         params: { onAddToDiet: addToDietFunction, nutritionalInfo: { carbs, protein, fat, kcal } },
@@ -49,16 +51,20 @@ const ScanFoodScreen = () => {
 
         // Extract specific nutritional information
         const { nutriments } = fetchedFoodData;
-        const carbs = nutriments['carbohydrates_100g'] || 0;
-        const protein = nutriments['proteins_100g'] || 0;
-        const fat = nutriments['fat_100g'] || 0;
-        const kcal = nutriments['energy-kcal_value_computed'] || 0;
 
+        // Log the entire nutriments object to the console for inspection
+        console.log('Nutriments:', nutriments);
+        
+        // Extract specific nutritional information
+        const carbs = nutriments?.carbohydrates_100g || 0;
+        const protein = nutriments?.proteins_100g || 0;
+        const fat = nutriments?.fat_100g || 0;
+        const kcal = nutriments?.['energy-kcal_value_computed'] || 0;
+        
         // Set the retrieved nutritional information in state
         setFoodData({ carbs, protein, fat, kcal });
         setScanned(true);
         addToDiet({ carbs, protein, fat, kcal });
-        navigation.navigate('DietScreen', { foodData });
       } else {
         console.warn('No product found for the given barcode.');
       }

@@ -1,63 +1,62 @@
-// WorkoutScreen.js
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { ScrollView, View, Text, StyleSheet } from 'react-native';
 
-const WorkoutScreen = ({ navigation }) => {
-  const levels = [
-    { level: 'Beginner', workouts: ['Workout 1', 'Workout 2', 'Workout 3'] },
-    { level: 'Intermediate', workouts: ['Workout 4', 'Workout 5', 'Workout 6'] },
-    { level: 'Advanced', workouts: ['Workout 7', 'Workout 8', 'Workout 9'] },
-  ];
-
-  const navigateToWorkoutScreen = (level, workout) => {
-    navigation.navigate('WorkoutDetails', { level, workout });
-  };
-
+const WorkoutScreen = () => {
   return (
-    <View style={styles.container}>
-      {levels.map((item) => (
-        <View key={item.level} style={styles.levelContainer}>
-          <Text style={styles.heading}>{item.level}</Text>
-          {item.workouts.map((workout, index) => (
-            <TouchableOpacity
-              key={workout}
-              style={styles.workoutButton}
-              onPress={() => navigateToWorkoutScreen(item.level, workout)}
-            >
-              <Text style={styles.workoutButtonText}>{workout}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      ))}
-    </View>
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Workout A</Text>
+        {renderExercise('Squats', 5, 5)}
+        {renderExercise('Bench Press', 5, 5)}
+        {renderExercise('Bent Over Row', 5, 5)}
+
+        <Text style={[styles.title, styles.marginTop]}>Workout B</Text>
+        {renderExercise('Squats', 5, 5)}
+        {renderExercise('Deadlift', 1, 5)}
+        {renderExercise('Overhead Press', 5, 5)}
+      </View>
+    </ScrollView>
   );
 };
 
+const renderExercise = (exercise, sets, reps) => (
+  <View style={styles.exerciseContainer} key={exercise}>
+    <Text style={styles.exerciseTitle}>Exercise: {exercise}</Text>
+    <Text style={styles.setsReps}>Sets: {sets} Reps: {reps}</Text>
+  </View>
+);
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: 'center',
+    alignItems: 'center',
   },
-  levelContainer: {
+  container: {
+    paddingVertical: 20,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
     marginBottom: 20,
   },
-  heading: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#3498db', // Blue color
-    marginBottom: 10,
-  },
-  workoutButton: {
-    backgroundColor: '#3498db', // Blue color
-    padding: 15,
+  exerciseContainer: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 20,
     borderRadius: 10,
     marginBottom: 10,
   },
-  workoutButtonText: {
-    color: 'white',
+  exerciseTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
-    textAlign: 'center',
+    marginBottom: 10,
+  },
+  setsReps: {
+    fontSize: 16,
+  },
+  marginTop: {
+    marginTop: 20,
   },
 });
 

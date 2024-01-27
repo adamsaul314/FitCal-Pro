@@ -8,13 +8,14 @@ const DietScreen = ({ route }) => {
   useEffect(() => {
     if (onAddToDiet && nutritionalInfo) {
       onAddToDiet(nutritionalInfo);
+      console.log('Received Nutritional Info in DietScreen:', nutritionalInfo);
     }
   }, [onAddToDiet, nutritionalInfo]);
 
-  // Log the dietData to check its values
-  useEffect(() => {
-    console.log('Diet Data:', dietData);
-  }, [dietData]);
+  // // Log the dietData to check its values
+  // useEffect(() => {
+  //   console.log('Diet Data:', dietData);
+  // }, [dietData]);
 
   return (
     <View style={styles.container}>
