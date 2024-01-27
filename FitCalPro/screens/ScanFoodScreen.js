@@ -1,11 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
+import { useNavigation } from '@react-navigation/native';
 
 const ScanFoodScreen = () => {
   const [hasPermission, setHasPermission] = useState(null);
+  const navigation = useNavigation();
   const [scanned, setScanned] = useState(false);
   const [foodData, setFoodData] = useState(null);
+
+  const addToDietFunction = (nutritionalInfo) => {
+    // Implement your addToDiet logic here
+    console.log('Adding to Diet:', nutritionalInfo);
+  };
+
+  const addToDiet = ({ carbs, protein, fat, kcal }) => {
+    if (navigation) {
+      // Navigate back to DietScreen and pass the nutritionalInfo directly
+      navigation.navigate('DietScreen', {
+        screen: 'DietTab',
+        params: { onAddToDiet: addToDietFunction, nutritionalInfo: { carbs, protein, fat, kcal } },
+      });
+    }
+  };
 
   useEffect(() => {
     (async () => {
@@ -40,6 +57,8 @@ const ScanFoodScreen = () => {
         // Set the retrieved nutritional information in state
         setFoodData({ carbs, protein, fat, kcal });
         setScanned(true);
+        addToDiet({ carbs, protein, fat, kcal });
+        navigation.navigate('DietScreen', { foodData });
       } else {
         console.warn('No product found for the given barcode.');
       }
@@ -93,6 +112,7 @@ const ScanFoodScreen = () => {
                   {foodData ? `Kcal: ${foodData.kcal.toFixed(0)} kcal` : ''}
                 </Text>
                 <Button title="Scan Again" onPress={resetScanner} />
+                <Button title="Add to Diet" onPress={() => addToDiet({ foodData })} />
               </View>
             ) : (
               <Button title="Scan Barcode" onPress={startScanner} />
