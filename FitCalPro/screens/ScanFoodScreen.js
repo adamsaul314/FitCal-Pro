@@ -32,13 +32,15 @@ const ScanFoodScreen = () => {
 
         // Extract specific nutritional information
         const { nutriments } = fetchedFoodData;
+        const productName = fetchedFoodData.product_name;     
+        const productQuantity = fetchedFoodData.product_quantity;
         const carbs = nutriments['carbohydrates_100g'] || 0;
         const protein = nutriments['proteins_100g'] || 0;
         const fat = nutriments['fat_100g'] || 0;
         const kcal = nutriments['energy-kcal_value_computed'] || 0;
 
         // Set the retrieved nutritional information in state
-        setFoodData({ carbs, protein, fat, kcal });
+        setFoodData({ productName, productQuantity, carbs, protein, fat, kcal });
         setScanned(true);
       } else {
         console.warn('No product found for the given barcode.');
@@ -80,6 +82,12 @@ const ScanFoodScreen = () => {
           <View style={styles.buttonContainer}>
             {scanned ? (
               <View style={styles.infoContainer}>
+                <Text style={styles.infoText}>
+                  {foodData ? `Product Name: ${foodData.productName}` : ``}
+                </Text>
+                <Text style={styles.infoText}>
+                  {foodData ? `Serving Size: ${foodData.productQuantity}` : ``}
+                </Text>
                 <Text style={styles.infoText}>
                   {foodData ? `Carbs: ${foodData.carbs.toFixed(0)}g` : 'Scan a Barcode'}
                 </Text>
