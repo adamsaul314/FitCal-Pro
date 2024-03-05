@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Button} from 'react-native';
 
 const DietScreen = ({ route }) => {
   const [loggedItems, setLoggedItems] = useState([]);
@@ -21,6 +21,10 @@ const DietScreen = ({ route }) => {
     { carbs: 0, protein: 0, fat: 0, kcal: 0 }
   );
 
+  const removeItem = (index) => {
+    setLoggedItems(currentItems => currentItems.filter((item, idx) => idx !== index));
+  };
+
   return (
     <ScrollView style={styles.container}>
       {loggedItems.map((item, index) => (
@@ -30,6 +34,7 @@ const DietScreen = ({ route }) => {
           <Text>Protein: {item.protein.toFixed(2)}g</Text>
           <Text>Fat: {item.fat.toFixed(2)}g</Text>
           <Text>Kcal: {item.kcal.toFixed(2)}</Text>
+          <Button title="Remove" onPress={() => removeItem(index)} />
         </View>
       ))}
       <View style={styles.totalsContainer}>
