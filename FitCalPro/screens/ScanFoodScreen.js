@@ -55,6 +55,7 @@ const ScanFoodScreen = () => {
     }
     const weightFactor = parseFloat(consumedWeight) / 100;
     const nutritionalInfo = {
+      productName: foodData.productName,
       carbs: foodData.carbs * weightFactor,
       protein: foodData.protein * weightFactor,
       fat: foodData.fat * weightFactor,
