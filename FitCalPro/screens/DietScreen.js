@@ -1,34 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 
 const DietScreen = ({ route }) => {
-  const { onAddToDiet, nutritionalInfo } = route.params ?? {};
   const [dietData, setDietData] = useState({ carbs: 0, protein: 0, fat: 0, kcal: 0 });
 
   useEffect(() => {
-    if (onAddToDiet && nutritionalInfo) {
-      onAddToDiet(nutritionalInfo);
-      console.log('Received Nutritional Info in DietScreen:', nutritionalInfo);
+    if (route.params?.nutritionalInfo) {
+      const { carbs, protein, fat, kcal } = route.params.nutritionalInfo;
+      setDietData({ carbs, protein, fat, kcal });
     }
-  }, [onAddToDiet, nutritionalInfo]);
-
-  // // Log the dietData to check its values
-  // useEffect(() => {
-  //   console.log('Diet Data:', dietData);
-  // }, [dietData]);
+  }, [route.params?.nutritionalInfo]);
 
   return (
     <View style={styles.container}>
-      <View style={styles.infoContainer}>
-        <Text style={styles.infoText}>Carbs: {dietData.carbs.toFixed(0)}g</Text>
-        <Text style={styles.infoText}>Protein: {dietData.protein.toFixed(0)}g</Text>
-        <Text style={styles.infoText}>Fat: {dietData.fat.toFixed(0)}g</Text>
-        <Text style={styles.infoText}>Kcal: {dietData.kcal.toFixed(0)} kcal</Text>
-      </View>
-      <Button
-        title="Clear Diet"
-        onPress={() => setDietData({ carbs: 0, protein: 0, fat: 0, kcal: 0 })}
-      />
+      <Text style={styles.infoText}>Carbs: {dietData.carbs}g</Text>
+      <Text style={styles.infoText}>Protein: {dietData.protein}g</Text>
+      <Text style={styles.infoText}>Fat: {dietData.fat}g</Text>
+      <Text style={styles.infoText}>Kcal: {dietData.kcal}</Text>
     </View>
   );
 };
@@ -39,15 +27,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  infoContainer: {
-    backgroundColor: 'white',
-    padding: 16,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
   infoText: {
-    marginBottom: 10,
+    fontSize: 16,
+    margin: 10,
   },
 });
 

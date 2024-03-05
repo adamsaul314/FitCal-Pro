@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, Button, StyleSheet, TextInput, Alert, Keyboard } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { useNavigation } from '@react-navigation/native';
 
@@ -8,23 +8,7 @@ const ScanFoodScreen = () => {
   const navigation = useNavigation();
   const [scanned, setScanned] = useState(false);
   const [foodData, setFoodData] = useState(null);
-
-  const addToDietFunction = (nutritionalInfo) => {
-    console.log('Adding to Diet:', nutritionalInfo);
-    navigation.navigate('DietScreen', {
-      screen: 'DietTab',
-      params: { onAddToDiet: addToDietFunction, nutritionalInfo },
-    });
-  };
-
-  const addToDiet = ({ carbs, protein, fat, kcal }) => {
-    if (navigation) {
-      navigation.navigate('DietScreen', {
-        screen: 'DietTab',
-        params: { onAddToDiet: addToDietFunction, nutritionalInfo: { carbs, protein, fat, kcal } },
-      });
-    }
-  };
+  const [consumedWeight, setConsumedWeight] = useState('');
 
   useEffect(() => {
     (async () => {
@@ -35,51 +19,54 @@ const ScanFoodScreen = () => {
 
   const fetchFoodInfo = async (barcode) => {
     try {
-      const response = await fetch(
-        `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
-      );
-
+      const response = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-
       const data = await response.json();
-
       if (data && data.product) {
-        const fetchedFoodData = data.product;
-        console.log('Food Information:', fetchedFoodData);
-
-        // Extract specific nutritional information
-        const { nutriments } = fetchedFoodData;
-
-        // Log the entire nutriments object to the console for inspection
-        console.log('Nutriments:', nutriments);
-        
-        // Extract specific nutritional information
-        const carbs = nutriments?.carbohydrates_100g || 0;
-        const protein = nutriments?.proteins_100g || 0;
-        const fat = nutriments?.fat_100g || 0;
-        const kcal = nutriments?.['energy-kcal_value_computed'] || 0;
-        
-        // Set the retrieved nutritional information in state
-        setFoodData({ productName, productQuantity, carbs, protein, fat, kcal });
+        const { nutriments, product_name, product_quantity } = data.product;
+        setFoodData({
+          productName: product_name,
+          productQuantity: product_quantity,
+          carbs: nutriments.carbohydrates_100g || 0,
+          protein: nutriments.proteins_100g || 0,
+          fat: nutriments.fat_100g || 0,
+          kcal: nutriments.energy_value || 0, // Ensure this key exists or use a fallback key
+        });
         setScanned(true);
-        addToDiet({ carbs, protein, fat, kcal });
       } else {
-        console.warn('No product found for the given barcode.');
+        Alert.alert('No product found for the given barcode.');
       }
     } catch (error) {
-      console.error('Error fetching food information:', error);
+      Alert.alert('Error fetching food information:', error.toString());
     }
   };
 
-  const resetScanner = () => {
-    setScanned(false);
-    setFoodData(null);
+  const handleBarCodeScanned = ({ type, data }) => {
+    setScanned(true);
+    fetchFoodInfo(data);
   };
 
-  const startScanner = () => {
-    setScanned(false);
+  const calculateAndAddToDiet = () => {
+    if (!consumedWeight) {
+      Alert.alert('Please enter the weight of the food you are consuming.');
+      return;
+    }
+    const weightFactor = parseFloat(consumedWeight) / 100;
+    const nutritionalInfo = {
+      carbs: foodData.carbs * weightFactor,
+      protein: foodData.protein * weightFactor,
+      fat: foodData.fat * weightFactor,
+      kcal: foodData.kcal * weightFactor,
+    };
+    // Proceed to add nutritionalInfo to diet
+    // You can use navigation or another state update to handle this
+    Alert.alert('Added to Diet', `Nutritional info for ${consumedWeight}g has been added.`);
+    navigation.navigate('DietScreen', { nutritionalInfo });
+
+
+    Keyboard.dismiss();
   };
 
   return (
@@ -91,45 +78,31 @@ const ScanFoodScreen = () => {
       ) : (
         <>
           {!scanned && (
-            <View style={styles.scannerContainer}>
-              <BarCodeScanner
-                onBarCodeScanned={({ data }) => {
-                  setScanned(true);
-                  fetchFoodInfo(data);
-                }}
-                style={StyleSheet.absoluteFill}
+            <BarCodeScanner
+              onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+              style={StyleSheet.absoluteFillObject}
+            />
+          )}
+          {scanned && (
+            <View style={styles.infoContainer}>
+              <Text style={styles.infoText}>
+                {foodData ? `Product Name: ${foodData.productName}` : 'Scan a barcode to start'}
+              </Text>
+              <Text style={styles.infoText}>
+                {foodData ? `Serving Size: ${foodData.productQuantity}` : ''}
+              </Text>
+              {/* Input for the consumed weight */}
+              <TextInput
+                style={styles.input}
+                onChangeText={text => setConsumedWeight(text)}
+                value={consumedWeight}
+                placeholder="Enter weight in grams"
+                keyboardType="numeric"
               />
+              <Button title="Add to Diet" onPress={calculateAndAddToDiet} />
+              <Button title="Scan Another" onPress={() => setScanned(false)} />
             </View>
           )}
-
-          <View style={styles.buttonContainer}>
-            {scanned ? (
-              <View style={styles.infoContainer}>
-                <Text style={styles.infoText}>
-                  {foodData ? `Product Name: ${foodData.productName}` : ``}
-                </Text>
-                <Text style={styles.infoText}>
-                  {foodData ? `Serving Size: ${foodData.productQuantity}` : ``}
-                </Text>
-                <Text style={styles.infoText}>
-                  {foodData ? `Carbs: ${foodData.carbs.toFixed(0)}g` : 'Scan a Barcode'}
-                </Text>
-                <Text style={styles.infoText}>
-                  {foodData ? `Protein: ${foodData.protein.toFixed(0)}g` : ''}
-                </Text>
-                <Text style={styles.infoText}>
-                  {foodData ? `Fat: ${foodData.fat.toFixed(0)}g` : ''}
-                </Text>
-                <Text style={styles.infoText}>
-                  {foodData ? `Kcal: ${foodData.kcal.toFixed(0)} kcal` : ''}
-                </Text>
-                <Button title="Scan Again" onPress={resetScanner} />
-                <Button title="Add to Diet" onPress={() => addToDiet({ foodData })} />
-              </View>
-            ) : (
-              <Button title="Scan Barcode" onPress={startScanner} />
-            )}
-          </View>
         </>
       )}
     </View>
@@ -140,26 +113,23 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-  },
-  scannerContainer: {
-    flex: 1,
-  },
-  buttonContainer: {
     alignItems: 'center',
-    marginBottom: 16,
   },
   infoContainer: {
-    position: 'absolute',
-    bottom: 16,
-    left: 16,
-    right: 16,
-    backgroundColor: 'white',
-    padding: 16,
-    borderRadius: 10,
+    marginTop: 30,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   infoText: {
-    marginBottom: 10,
+    fontSize: 16,
+    margin: 5,
+  },
+  input: {
+    height: 40,
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
+    width: '80%', // Adjust as necessary
   },
 });
 
