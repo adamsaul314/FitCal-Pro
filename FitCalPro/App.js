@@ -81,7 +81,7 @@ import ScanFoodScreen from './screens/ScanFoodScreen';
    return (
      <Tab.Navigator>
        <Tab.Screen name="Workout" component={WorkoutScreen} options={{ headerShown: false }}/>
-       <Tab.Screen name="Diet" component={DietScreen} />
+       <Tab.Screen name="DietScreen" component={DietScreen} />
        <Tab.Screen name="Scan" component={ScanFoodScreen}/>
        <Tab.Screen name="Profile" component={ProfileScreen} />
      </Tab.Navigator>

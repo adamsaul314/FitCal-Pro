@@ -1,105 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
-import { BarCodeScanner } from 'expo-barcode-scanner';
 
-const DietScreen = () => {
-  const [hasPermission, setHasPermission] = useState(null);
-  const [scanned, setScanned] = useState(false);
-  const [foodData, setFoodData] = useState(null);
+const DietScreen = ({ route }) => {
+  const { onAddToDiet, nutritionalInfo } = route.params ?? {};
+  const [dietData, setDietData] = useState({ carbs: 0, protein: 0, fat: 0, kcal: 0 });
 
   useEffect(() => {
-    (async () => {
-      const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
-  }, []);
-
-  const fetchFoodInfo = async (barcode) => {
-    try {
-      const response = await fetch(
-        `https://world.openfoodfacts.org/api/v0/product/${barcode}.json`
-      );
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (data && data.product) {
-        const fetchedFoodData = data.product;
-        console.log('Food Information:', fetchedFoodData);
-
-        // Extract specific nutritional information
-        const { nutriments } = fetchedFoodData;
-        const carbs = nutriments['carbohydrates_100g'] || 0;
-        const protein = nutriments['proteins_100g'] || 0;
-        const fat = nutriments['fat_100g'] || 0;
-        const kcal = nutriments['energy-kcal_value_computed'] || 0;
-
-        // Set the retrieved nutritional information in state
-        setFoodData({ carbs, protein, fat, kcal });
-        setScanned(true);
-      } else {
-        console.warn('No product found for the given barcode.');
-      }
-    } catch (error) {
-      console.error('Error fetching food information:', error);
+    if (onAddToDiet && nutritionalInfo) {
+      onAddToDiet(nutritionalInfo);
+      console.log('Received Nutritional Info in DietScreen:', nutritionalInfo);
     }
-  };
+  }, [onAddToDiet, nutritionalInfo]);
 
-  const resetScanner = () => {
-    setScanned(false);
-    setFoodData(null);
-  };
-
-  const startScanner = () => {
-    setScanned(false);
-  };
+  // // Log the dietData to check its values
+  // useEffect(() => {
+  //   console.log('Diet Data:', dietData);
+  // }, [dietData]);
 
   return (
     <View style={styles.container}>
-      {hasPermission === null ? (
-        <Text>Requesting camera permission</Text>
-      ) : hasPermission === false ? (
-        <Text>No access to camera</Text>
-      ) : (
-        <>
-          {!scanned && (
-            <View style={styles.scannerContainer}>
-              <BarCodeScanner
-                onBarCodeScanned={({ data }) => {
-                  setScanned(true);
-                  fetchFoodInfo(data);
-                }}
-                style={StyleSheet.absoluteFill}
-              />
-            </View>
-          )}
-
-          <View style={styles.buttonContainer}>
-            {scanned ? (
-              <View style={styles.infoContainer}>
-                <Text style={styles.infoText}>
-                  {foodData ? `Carbs: ${foodData.carbs.toFixed(0)}g` : 'Scan a Barcode'}
-                </Text>
-                <Text style={styles.infoText}>
-                  {foodData ? `Protein: ${foodData.protein.toFixed(0)}g` : ''}
-                </Text>
-                <Text style={styles.infoText}>
-                  {foodData ? `Fat: ${foodData.fat.toFixed(0)}g` : ''}
-                </Text>
-                <Text style={styles.infoText}>
-                  {foodData ? `Kcal: ${foodData.kcal.toFixed(0)} kcal` : ''}
-                </Text>
-                <Button title="Scan Again" onPress={resetScanner} />
-              </View>
-            ) : (
-              <Button title="Scan Barcode" onPress={startScanner} />
-            )}
-          </View>
-        </>
-      )}
+      <View style={styles.infoContainer}>
+        <Text style={styles.infoText}>Carbs: {dietData.carbs.toFixed(0)}g</Text>
+        <Text style={styles.infoText}>Protein: {dietData.protein.toFixed(0)}g</Text>
+        <Text style={styles.infoText}>Fat: {dietData.fat.toFixed(0)}g</Text>
+        <Text style={styles.infoText}>Kcal: {dietData.kcal.toFixed(0)} kcal</Text>
+      </View>
+      <Button
+        title="Clear Diet"
+        onPress={() => setDietData({ carbs: 0, protein: 0, fat: 0, kcal: 0 })}
+      />
     </View>
   );
 };
@@ -108,23 +37,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-  },
-  scannerContainer: {
-    flex: 1,
-  },
-  buttonContainer: {
     alignItems: 'center',
-    marginBottom: 16,
   },
   infoContainer: {
-    position: 'absolute',
-    bottom: 16,
-    left: 16,
-    right: 16,
     backgroundColor: 'white',
     padding: 16,
     borderRadius: 10,
     alignItems: 'center',
+    marginBottom: 16,
   },
   infoText: {
     marginBottom: 10,
