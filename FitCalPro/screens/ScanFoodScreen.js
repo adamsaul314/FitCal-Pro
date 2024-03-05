@@ -51,15 +51,6 @@ const ScanFoodScreen = () => {
 
         // Extract specific nutritional information
         const { nutriments } = fetchedFoodData;
-<<<<<<< HEAD
-        const productName = fetchedFoodData.product_name;     
-        const productQuantity = fetchedFoodData.product_quantity;
-        const carbs = nutriments['carbohydrates_100g'] || 0;
-        const protein = nutriments['proteins_100g'] || 0;
-        const fat = nutriments['fat_100g'] || 0;
-        const kcal = nutriments['energy-kcal_value_computed'] || 0;
-=======
->>>>>>> 64c4d62f83e9598d0d34896a54fec3892eb64d87
 
         // Log the entire nutriments object to the console for inspection
         console.log('Nutriments:', nutriments);
