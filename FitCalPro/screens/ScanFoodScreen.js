@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, Button, StyleSheet, TextInput, Alert, Keyboard } from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { useNavigation } from '@react-navigation/native';
-import firestore from '@react-native-firebase/firestore';
 
 
 const ScanFoodScreen = () => {
@@ -11,19 +10,6 @@ const ScanFoodScreen = () => {
   const [scanned, setScanned] = useState(false);
   const [foodData, setFoodData] = useState(null);
   const [consumedWeight, setConsumedWeight] = useState('');
-
-  const addFoodLog = (userId, foodName, calories, protein, carbs, fats, date) => {
-    return firestore().collection('loggedFoods').add({
-      userId,
-      date,
-      foodName,
-      calories,
-      protein,
-      carbs,
-      fats
-    });
-  };
-  
 
   useEffect(() => {
     (async () => {
