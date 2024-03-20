@@ -34,6 +34,10 @@ const ProfileScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Welcome, {user?.email}</Text>
+      <Button
+        title="Go to Health Profile"
+        onPress={() => navigation.navigate('HealthProfile')}
+      />
       <Button title="Logout" onPress={handleLogout} />
     </View>
   );

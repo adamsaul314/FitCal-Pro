@@ -59,6 +59,7 @@ import ProfileScreen from './screens/ProfileScreen';
  import app from './firebase';
 import RegisterScreen from './screens/RegisterScreen';
 import ScanFoodScreen from './screens/ScanFoodScreen';
+import HealthProfileScreen from './screens/healthprofileScreen.js';
 
 
  const Stack = createNativeStackNavigator();
@@ -96,6 +97,7 @@ import ScanFoodScreen from './screens/ScanFoodScreen';
          <Stack.Screen name="Register" component={RegisterScreen} />
          <Stack.Screen name="HomeTabs" component={HomeTabs} options={{ headerShown: false }} />
          <Stack.Screen name="WorkoutDetails" component={WorkoutDetailsScreen}  />
+         <Stack.Screen name="HealthProfile" component={HealthProfileScreen} />
        </Stack.Navigator>
      </NavigationContainer>
    );
