@@ -1,16 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Button} from 'react-native';
+import { getAuth } from 'firebase/auth';
+import { firestore } from '../firebase';
+import { collection, query, where, onSnapshot } from 'firebase/firestore';
+
+
 
 const DietScreen = ({ route }) => {
   const [loggedItems, setLoggedItems] = useState([]);
 
-  useEffect(() => {
-    console.log(route.params?.nutritionalInfo);
-    if (route.params?.nutritionalInfo) {
-      setLoggedItems(currentItems => [...currentItems, route.params.nutritionalInfo]);
-    }
-  }, [route.params?.nutritionalInfo]);
+  // useEffect(() => {
+  //   console.log(route.params?.nutritionalInfo);
+  //   if (route.params?.nutritionalInfo) {
+  //     setLoggedItems(currentItems => [...currentItems, route.params.nutritionalInfo]);
+  //   }
+  // }, [route.params?.nutritionalInfo]);
 
+  useEffect(() => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (user) {
+      const q = query(collection(firestore, "loggedFoods"), where("userId", "==", user.uid));
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const items = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setLoggedItems(items);
+      });
+      return () => unsubscribe(); // Cleanup subscription on unmount
+    }
+  }, []); 
+
+  // The rest of your component remains the same
+
+  
   const totals = loggedItems.reduce(
     (acc, item) => ({
       carbs: acc.carbs + item.carbs,
