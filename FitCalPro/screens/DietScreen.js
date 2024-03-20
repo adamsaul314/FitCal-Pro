@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Button} from 'react-native';
 import { getAuth } from 'firebase/auth';
 import { firestore } from '../firebase';
-import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 
 
 
@@ -42,8 +42,18 @@ const DietScreen = ({ route }) => {
     { carbs: 0, protein: 0, fat: 0, kcal: 0 }
   );
 
-  const removeItem = (index) => {
-    setLoggedItems(currentItems => currentItems.filter((item, idx) => idx !== index));
+  // const removeItem = (index) => {
+  //   setLoggedItems(currentItems => currentItems.filter((item, idx) => idx !== index));
+  // };
+
+  const removeItem = async (itemId) => {
+    try {
+      await deleteDoc(doc(firestore, "loggedFoods", itemId));
+      // Optional: Show a success message or perform additional state updates if necessary
+    } catch (error) {
+      console.error("Error removing document: ", error);
+      // Optional: Show an error message
+    }
   };
 
   return (
@@ -55,7 +65,7 @@ const DietScreen = ({ route }) => {
           <Text>Protein: {item.protein.toFixed(2)}g</Text>
           <Text>Fat: {item.fat.toFixed(2)}g</Text>
           <Text>Kcal: {item.kcal.toFixed(2)}</Text>
-          <Button title="Remove" onPress={() => removeItem(index)} />
+          <Button title="Remove" onPress={() => removeItem(item.id)} />
         </View>
       ))}
       <View style={styles.totalsContainer}>
