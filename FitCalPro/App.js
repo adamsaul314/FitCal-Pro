@@ -60,6 +60,7 @@ import ProfileScreen from './screens/ProfileScreen';
 import RegisterScreen from './screens/RegisterScreen';
 import ScanFoodScreen from './screens/ScanFoodScreen';
 import HealthProfileScreen from './screens/healthprofileScreen.js';
+import AddFoodForm from './components/addFoodForm';
 
 
  const Stack = createNativeStackNavigator();
@@ -98,6 +99,7 @@ import HealthProfileScreen from './screens/healthprofileScreen.js';
          <Stack.Screen name="HomeTabs" component={HomeTabs} options={{ headerShown: false }} />
          <Stack.Screen name="WorkoutDetails" component={WorkoutDetailsScreen}  />
          <Stack.Screen name="HealthProfile" component={HealthProfileScreen} />
+         <Stack.Screen name='AddFoodForm' component={AddFoodForm} />
        </Stack.Navigator>
      </NavigationContainer>
    );

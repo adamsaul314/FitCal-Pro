@@ -6,6 +6,7 @@ import { collection, query, where, onSnapshot, deleteDoc, doc } from 'firebase/f
 import DateSelector from '../components/dateSelector';
 import { getFirestore } from 'firebase/firestore';
 import MealTypeSection from '../components/MealTypeSection';
+import AddFoodForm from '../components/addFoodForm';
 
 
 
@@ -14,7 +15,11 @@ const DietScreen = ({ route }) => {
   const [loggedItems, setLoggedItems] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [calorieGoal, setCalorieGoal] = useState(null);
+  const [isFormVisible, setIsFormVisible] = useState(false);
+  const [currentMealType, setCurrentMealType] = useState('');
 
+  const auth = getAuth();
+  const user = auth.currentUser;
 
   useEffect(() => {
     const auth = getAuth();
@@ -59,13 +64,15 @@ const DietScreen = ({ route }) => {
   }, [selectedDate]); // Depend on selectedDate
   
   const handleAddFood = (mealType) => {
-    console.log(`Add Food For ${mealType}`);
+    setCurrentMealType(mealType);
+    setIsFormVisible(true); // Show the form
   };
 
   const handleScanFood = (mealType) => {
     console.log(`Scan Food For ${mealType}`);
   };
 
+  
 
   const totals = loggedItems.reduce(
     (acc, item) => ({
@@ -94,6 +101,8 @@ const DietScreen = ({ route }) => {
       <MealTypeSection mealType="Lunch" onAddFood={() => handleAddFood('Lunch')} onScanFood={() => handleScanFood('Lunch')} />
       <MealTypeSection mealType="Dinner" onAddFood={() => handleAddFood('Dinner')} onScanFood={() => handleScanFood('Dinner')} />
       <MealTypeSection mealType="Snacks" onAddFood={() => handleAddFood('Snacks')} onScanFood={() => handleScanFood('Snacks')} />
+      {isFormVisible && (
+  <AddFoodForm userId={user.uid} date={selectedDate.toISOString().split('T')[0]}/>)}
       {loggedItems.map((item, index) => (
         <View key={index} style={styles.itemContainer}>
           <Text>Product Name: {item.productName}</Text>
