@@ -4,34 +4,58 @@ import { getAuth } from 'firebase/auth';
 import { firestore } from '../firebase';
 import { collection, query, where, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import DateSelector from '../components/dateSelector';
+import { getFirestore } from 'firebase/firestore';
 
 
 
 const DietScreen = ({ route }) => {
   const [loggedItems, setLoggedItems] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [calorieGoal, setCalorieGoal] = useState(null);
+
 
   useEffect(() => {
-    const fetchLoggedFoodsForDate = async (date) => {
-      const formattedDate = date.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
-      const auth = getAuth();
-      const user = auth.currentUser;
-      if (user) {
+    const auth = getAuth();
+    const db = getFirestore();
+    const user = auth.currentUser;
+  
+    if (user) {
+      // Fetching logged foods
+      const fetchLoggedFoodsForDate = (date) => {
+        const formattedDate = date.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
         const q = query(
-          collection(firestore, "loggedFoods"),
+          collection(db, "loggedFoods"),
           where("userId", "==", user.uid),
           where("date", "==", formattedDate)
         );
-        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+  
+        return onSnapshot(q, (querySnapshot) => {
           const items = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
           setLoggedItems(items);
         });
-        return () => unsubscribe();
-      }
-    };
+      };
   
-    fetchLoggedFoodsForDate(selectedDate);
+      // Fetching caloric needs
+      const userProfileRef = doc(db, "userProfiles", user.uid);
+      const unsubscribeProfile = onSnapshot(userProfileRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const userData = docSnap.data();
+          setCalorieGoal(userData.caloricNeeds);
+        } else {
+          console.log("No profile data found.");
+        }
+      });
+  
+      const unsubscribeFoods = fetchLoggedFoodsForDate(selectedDate);
+  
+      // Cleanup function
+      return () => {
+        unsubscribeFoods();
+        unsubscribeProfile();
+      };
+    }
   }, [selectedDate]); // Depend on selectedDate
+  
 
 
 
@@ -73,6 +97,8 @@ const DietScreen = ({ route }) => {
         <Text style={styles.totalText}>Total Protein: {totals.protein.toFixed(2)}g</Text>
         <Text style={styles.totalText}>Total Fat: {totals.fat.toFixed(2)}g</Text>
         <Text style={styles.totalText}>Total Kcal: {totals.kcal.toFixed(2)}</Text>
+        {calorieGoal && <Text style={styles.totalText}>Calorie Goal: {Math.round(calorieGoal)}</Text>
+}
       </View>
     </ScrollView>
   );

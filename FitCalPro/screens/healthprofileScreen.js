@@ -76,14 +76,67 @@ const [healthGoalOpen, setHealthGoalOpen] = useState(false);
   };
 
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!name || !age || !gender || !height || !weight || !activityLevel || !healthGoal) {
       Alert.alert('Error', 'Please fill out all fields.');
       return;
     }
-    calculateBmi();
-    calculateCaloricNeeds();
+  
+    // Directly calculate BMI and caloric needs
+    const heightInMeters = height / 100;
+    const calculatedBmi = (weight / (heightInMeters ** 2)).toFixed(2);
+  
+    let bmr;
+    if (gender === 'male') {
+      bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
+    } else {
+      bmr = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+    }
+    const activityFactors = {
+      sedentary: 1.2,
+      lightly_active: 1.375,
+      moderately_active: 1.55,
+      very_active: 1.725,
+      extra_active: 1.9,
+    };
+    const tdee = bmr * activityFactors[activityLevel];
+    let calculatedCaloricNeeds;
+    if (healthGoal === 'lose') {
+      calculatedCaloricNeeds = tdee - 500;
+    } else if (healthGoal === 'gain') {
+      calculatedCaloricNeeds = tdee + 500;
+    } else {
+      calculatedCaloricNeeds = tdee;
+    }
+  
+    const db = getFirestore();
+    const auth = getAuth();
+    const user = auth.currentUser;
+  
+    if (user) {
+      const userProfileRef = doc(db, "userProfiles", user.uid);
+      try {
+        await setDoc(userProfileRef, {
+          name,
+          age,
+          gender,
+          height,
+          weight,
+          activityLevel,
+          healthGoal,
+          bmi: calculatedBmi,           // Use directly calculated value
+          caloricNeeds: calculatedCaloricNeeds,  // Use directly calculated value
+        }, { merge: true });
+  
+        console.log("User profile stored successfully");
+      } catch (error) {
+        console.error("Error saving user profile:", error);
+      }
+    } else {
+      Alert.alert("Authentication Error", "Please log in to save your profile.");
+    }
   };
+  
 
   return (
     <ScrollView contentContainerStyle={styles.contentContainer}>
