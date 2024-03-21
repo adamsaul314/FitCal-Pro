@@ -5,6 +5,8 @@ import { firestore } from '../firebase';
 import { collection, query, where, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import DateSelector from '../components/dateSelector';
 import { getFirestore } from 'firebase/firestore';
+import MealTypeSection from '../components/MealTypeSection';
+
 
 
 
@@ -56,7 +58,13 @@ const DietScreen = ({ route }) => {
     }
   }, [selectedDate]); // Depend on selectedDate
   
+  const handleAddFood = (mealType) => {
+    console.log(`Add Food For ${mealType}`);
+  };
 
+  const handleScanFood = (mealType) => {
+    console.log(`Scan Food For ${mealType}`);
+  };
 
 
   const totals = loggedItems.reduce(
@@ -82,6 +90,10 @@ const DietScreen = ({ route }) => {
   return (
     <ScrollView style={styles.container}>
       <DateSelector onDateSelected={setSelectedDate} />
+      <MealTypeSection mealType="Breakfast" onAddFood={() => handleAddFood('Breakfast')} onScanFood={() => handleScanFood('Breakfast')} />
+      <MealTypeSection mealType="Lunch" onAddFood={() => handleAddFood('Lunch')} onScanFood={() => handleScanFood('Lunch')} />
+      <MealTypeSection mealType="Dinner" onAddFood={() => handleAddFood('Dinner')} onScanFood={() => handleScanFood('Dinner')} />
+      <MealTypeSection mealType="Snacks" onAddFood={() => handleAddFood('Snacks')} onScanFood={() => handleScanFood('Snacks')} />
       {loggedItems.map((item, index) => (
         <View key={index} style={styles.itemContainer}>
           <Text>Product Name: {item.productName}</Text>
