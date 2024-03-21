@@ -72,7 +72,21 @@ const DietScreen = ({ route }) => {
     console.log(`Scan Food For ${mealType}`);
   };
 
-  
+  // Function to render items for a specific meal type
+  const renderItemsForMealType = (mealType) => {
+    return loggedItems
+      .filter(item => item.mealType === mealType)
+      .map((item, index) => (
+        <View key={index} style={styles.itemContainer}>
+          <Text>Product Name: {item.productName}</Text>
+          <Text>Carbs: {item.carbs.toFixed(2)}g</Text>
+          <Text>Protein: {item.protein.toFixed(2)}g</Text>
+          <Text>Fat: {item.fat.toFixed(2)}g</Text>
+          <Text>Kcal: {item.kcal.toFixed(2)}</Text>
+          <Button title="Remove" onPress={() => removeItem(item.id)} />
+        </View>
+      ));
+  };
 
   const totals = loggedItems.reduce(
     (acc, item) => ({
@@ -97,13 +111,20 @@ const DietScreen = ({ route }) => {
   return (
     <ScrollView style={styles.container}>
       <DateSelector onDateSelected={setSelectedDate} />
-      <MealTypeSection mealType="Breakfast" onAddFood={() => handleAddFood('Breakfast')} onScanFood={() => handleScanFood('Breakfast')} />
-      <MealTypeSection mealType="Lunch" onAddFood={() => handleAddFood('Lunch')} onScanFood={() => handleScanFood('Lunch')} />
-      <MealTypeSection mealType="Dinner" onAddFood={() => handleAddFood('Dinner')} onScanFood={() => handleScanFood('Dinner')} />
-      <MealTypeSection mealType="Snacks" onAddFood={() => handleAddFood('Snacks')} onScanFood={() => handleScanFood('Snacks')} />
+      <MealTypeSection mealType="Breakfast" onAddFood={() => handleAddFood('Breakfast')} onScanFood={() => handleScanFood('Breakfast')} loggedItems={loggedItems.filter(item => item.mealType === 'Breakfast')} />
+      <MealTypeSection mealType="Lunch" onAddFood={() => handleAddFood('Lunch')} onScanFood={() => handleScanFood('Lunch')} loggedItems={loggedItems.filter(item => item.mealType === 'Lunch')} />
+      <MealTypeSection mealType="Dinner" onAddFood={() => handleAddFood('Dinner')} onScanFood={() => handleScanFood('Dinner')} loggedItems={loggedItems.filter(item => item.mealType === 'Dinner')} />
+      <MealTypeSection mealType="Snacks" onAddFood={() => handleAddFood('Snacks')} onScanFood={() => handleScanFood('Snacks')} loggedItems={loggedItems.filter(item => item.mealType === 'Snacks')} />
+
       {isFormVisible && (
-  <AddFoodForm userId={user.uid} date={selectedDate.toISOString().split('T')[0]}/>)}
-      {loggedItems.map((item, index) => (
+        <AddFoodForm 
+        userId={user.uid} 
+        date={selectedDate.toISOString().split('T')[0]} 
+        mealType={currentMealType}
+        />
+        )}
+        
+      {/* {loggedItems.map((item, index) => (
         <View key={index} style={styles.itemContainer}>
           <Text>Product Name: {item.productName}</Text>
           <Text>Carbs: {item.carbs.toFixed(2)}g</Text>
@@ -112,7 +133,7 @@ const DietScreen = ({ route }) => {
           <Text>Kcal: {item.kcal.toFixed(2)}</Text>
           <Button title="Remove" onPress={() => removeItem(item.id)} />
         </View>
-      ))}
+      ))} */}
       <View style={styles.totalsContainer}>
         <Text style={styles.totalText}>Total Carbs: {totals.carbs.toFixed(2)}g</Text>
         <Text style={styles.totalText}>Total Protein: {totals.protein.toFixed(2)}g</Text>

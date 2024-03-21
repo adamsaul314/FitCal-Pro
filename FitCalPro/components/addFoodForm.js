@@ -3,7 +3,7 @@ import { View, TextInput, Button, StyleSheet } from 'react-native';
 import { addDoc, collection } from 'firebase/firestore';
 import { getFirestore } from 'firebase/firestore';
 
-const AddFoodForm = ({ userId, date }) => {
+const AddFoodForm = ({ userId, date, mealType }) => {
   const [productName, setProductName] = useState('');
   const [carbs, setCarbs] = useState('');
   const [protein, setProtein] = useState('');
@@ -12,7 +12,7 @@ const AddFoodForm = ({ userId, date }) => {
 
   const db = getFirestore();
 
-  const handleAddFood = async () => {
+  const handleAddFood = async (foodItem) => {
     if (!productName || !carbs || !protein || !fat || !kcal) {
       alert('Please fill out all fields.');
       return;
@@ -31,7 +31,8 @@ const AddFoodForm = ({ userId, date }) => {
         protein: parseFloat(protein),
         fat: parseFloat(fat),
         kcal: parseFloat(kcal),
-        date
+        date,
+        mealType,
         // Include any other necessary fields, such as userId or date
       });
 
