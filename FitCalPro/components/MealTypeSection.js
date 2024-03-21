@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Button, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-const MealTypeSection = ({ mealType, onAddFood, onScanFood, loggedItems }) => {
+const MealTypeSection = ({ mealType, onAddFood, onScanFood, loggedItems, removeItem }) => {
   return (
     <View style={styles.mealTypeContainer}>
       <Text style={styles.mealTypeTitle}>{mealType}</Text>
@@ -15,6 +15,7 @@ const MealTypeSection = ({ mealType, onAddFood, onScanFood, loggedItems }) => {
             <Text style={styles.itemText}>Protein: {item.protein.toFixed(2)}g</Text>
             <Text style={styles.itemText}>Fat: {item.fat.toFixed(2)}g</Text>
             <Text style={styles.itemText}>Kcal: {item.kcal.toFixed(2)}</Text>
+            <Button title="Remove" onPress={() => removeItem(item.id)} />
             {/* Add a remove or edit button if necessary */}
           </View>
         ))}

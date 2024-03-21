@@ -101,20 +101,24 @@ const DietScreen = ({ route }) => {
   const removeItem = async (itemId) => {
     try {
       await deleteDoc(doc(firestore, "loggedFoods", itemId));
+      // Filter out the removed item from the loggedItems state
+      const updatedItems = loggedItems.filter(item => item.id !== itemId);
+      setLoggedItems(updatedItems); // Update the state with the filtered items
     } catch (error) {
       console.error("Error removing document: ", error);
     }
   };
+  
 
   
 
   return (
     <ScrollView style={styles.container}>
       <DateSelector onDateSelected={setSelectedDate} />
-      <MealTypeSection mealType="Breakfast" onAddFood={() => handleAddFood('Breakfast')} onScanFood={() => handleScanFood('Breakfast')} loggedItems={loggedItems.filter(item => item.mealType === 'Breakfast')} />
-      <MealTypeSection mealType="Lunch" onAddFood={() => handleAddFood('Lunch')} onScanFood={() => handleScanFood('Lunch')} loggedItems={loggedItems.filter(item => item.mealType === 'Lunch')} />
-      <MealTypeSection mealType="Dinner" onAddFood={() => handleAddFood('Dinner')} onScanFood={() => handleScanFood('Dinner')} loggedItems={loggedItems.filter(item => item.mealType === 'Dinner')} />
-      <MealTypeSection mealType="Snacks" onAddFood={() => handleAddFood('Snacks')} onScanFood={() => handleScanFood('Snacks')} loggedItems={loggedItems.filter(item => item.mealType === 'Snacks')} />
+      <MealTypeSection mealType="Breakfast" onAddFood={() => handleAddFood('Breakfast')} onScanFood={() => handleScanFood('Breakfast')} loggedItems={loggedItems.filter(item => item.mealType === 'Breakfast')} removeItem={removeItem}/>
+      <MealTypeSection mealType="Lunch" onAddFood={() => handleAddFood('Lunch')} onScanFood={() => handleScanFood('Lunch')} loggedItems={loggedItems.filter(item => item.mealType === 'Lunch')} removeItem={removeItem}/>
+      <MealTypeSection mealType="Dinner" onAddFood={() => handleAddFood('Dinner')} onScanFood={() => handleScanFood('Dinner')} loggedItems={loggedItems.filter(item => item.mealType === 'Dinner')} removeItem={removeItem}/>
+      <MealTypeSection mealType="Snacks" onAddFood={() => handleAddFood('Snacks')} onScanFood={() => handleScanFood('Snacks')} loggedItems={loggedItems.filter(item => item.mealType === 'Snacks')} removeItem={removeItem}/>
 
       {isFormVisible && (
         <AddFoodForm 
