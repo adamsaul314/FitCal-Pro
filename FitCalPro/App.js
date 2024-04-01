@@ -79,10 +79,11 @@ import AddFoodForm from './components/addFoodForm';
  };
  
  // HomeTabs component with a nested Stack.Navigator for WorkoutDetails
+ //       <Tab.Screen name="Workout" component={WorkoutScreen} options={{ headerShown: false }}/>
+
  const HomeTabs = () => {
    return (
      <Tab.Navigator>
-       <Tab.Screen name="Workout" component={WorkoutScreen} options={{ headerShown: false }}/>
        <Tab.Screen name="DietScreen" component={DietScreen} />
        <Tab.Screen name="Scan" component={ScanFoodScreen}/>
        <Tab.Screen name="Profile" component={ProfileScreen} />

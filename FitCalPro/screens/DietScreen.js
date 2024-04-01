@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Button} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Button, Modal, TouchableOpacity } from 'react-native';
 import { getAuth } from 'firebase/auth';
 import { firestore } from '../firebase';
 import { collection, query, where, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
@@ -8,15 +8,16 @@ import { getFirestore } from 'firebase/firestore';
 import MealTypeSection from '../components/MealTypeSection';
 import AddFoodForm from '../components/addFoodForm';
 
-
-
-
 const DietScreen = ({ route }) => {
   const [loggedItems, setLoggedItems] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [calorieGoal, setCalorieGoal] = useState(null);
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [currentMealType, setCurrentMealType] = useState('');
+
+  const closeModal = () => {
+    setIsFormVisible(false);
+  };
 
   const auth = getAuth();
   const user = auth.currentUser;
@@ -72,20 +73,15 @@ const DietScreen = ({ route }) => {
     console.log(`Scan Food For ${mealType}`);
   };
 
-  // Function to render items for a specific meal type
-  const renderItemsForMealType = (mealType) => {
-    return loggedItems
-      .filter(item => item.mealType === mealType)
-      .map((item, index) => (
-        <View key={index} style={styles.itemContainer}>
-          <Text>Product Name: {item.productName}</Text>
-          <Text>Carbs: {item.carbs.toFixed(2)}g</Text>
-          <Text>Protein: {item.protein.toFixed(2)}g</Text>
-          <Text>Fat: {item.fat.toFixed(2)}g</Text>
-          <Text>Kcal: {item.kcal.toFixed(2)}</Text>
-          <Button title="Remove" onPress={() => removeItem(item.id)} />
-        </View>
-      ));
+  const removeItem = async (itemId) => {
+    try {
+      await deleteDoc(doc(firestore, "loggedFoods", itemId));
+      // Filter out the removed item from the loggedItems state
+      const updatedItems = loggedItems.filter(item => item.id !== itemId);
+      setLoggedItems(updatedItems); // Update the state with the filtered items
+    } catch (error) {
+      console.error("Error removing document: ", error);
+    }
   };
 
   const totals = loggedItems.reduce(
@@ -98,20 +94,6 @@ const DietScreen = ({ route }) => {
     { carbs: 0, protein: 0, fat: 0, kcal: 0 }
   );
 
-  const removeItem = async (itemId) => {
-    try {
-      await deleteDoc(doc(firestore, "loggedFoods", itemId));
-      // Filter out the removed item from the loggedItems state
-      const updatedItems = loggedItems.filter(item => item.id !== itemId);
-      setLoggedItems(updatedItems); // Update the state with the filtered items
-    } catch (error) {
-      console.error("Error removing document: ", error);
-    }
-  };
-  
-
-  
-
   return (
     <ScrollView style={styles.container}>
       <DateSelector onDateSelected={setSelectedDate} />
@@ -120,32 +102,25 @@ const DietScreen = ({ route }) => {
       <MealTypeSection mealType="Dinner" onAddFood={() => handleAddFood('Dinner')} onScanFood={() => handleScanFood('Dinner')} loggedItems={loggedItems.filter(item => item.mealType === 'Dinner')} removeItem={removeItem}/>
       <MealTypeSection mealType="Snacks" onAddFood={() => handleAddFood('Snacks')} onScanFood={() => handleScanFood('Snacks')} loggedItems={loggedItems.filter(item => item.mealType === 'Snacks')} removeItem={removeItem}/>
 
-      {isFormVisible && (
-        <AddFoodForm 
-        userId={user.uid} 
-        date={selectedDate.toISOString().split('T')[0]} 
-        mealType={currentMealType}
-        />
-        )}
-        
-      {/* {loggedItems.map((item, index) => (
-        <View key={index} style={styles.itemContainer}>
-          <Text>Product Name: {item.productName}</Text>
-          <Text>Carbs: {item.carbs.toFixed(2)}g</Text>
-          <Text>Protein: {item.protein.toFixed(2)}g</Text>
-          <Text>Fat: {item.fat.toFixed(2)}g</Text>
-          <Text>Kcal: {item.kcal.toFixed(2)}</Text>
-          <Button title="Remove" onPress={() => removeItem(item.id)} />
-        </View>
-      ))} */}
       <View style={styles.totalsContainer}>
         <Text style={styles.totalText}>Total Carbs: {totals.carbs.toFixed(2)}g</Text>
         <Text style={styles.totalText}>Total Protein: {totals.protein.toFixed(2)}g</Text>
         <Text style={styles.totalText}>Total Fat: {totals.fat.toFixed(2)}g</Text>
         <Text style={styles.totalText}>Total Kcal: {totals.kcal.toFixed(2)}</Text>
-        {calorieGoal && <Text style={styles.totalText}>Calorie Goal: {Math.round(calorieGoal)}</Text>
-}
+        {calorieGoal && <Text style={styles.totalText}>Calorie Goal: {Math.round(calorieGoal)}</Text>}
       </View>
+
+      <Modal visible={isFormVisible} animationType="slide">
+  <View style={styles.modalContainer}>
+    <View style={styles.modalContent}>
+      <TouchableOpacity style={styles.closeButton} onPress={() => setIsFormVisible(false)}>
+        <Text style={styles.closeButtonText}>Close</Text>
+      </TouchableOpacity>
+      <AddFoodForm userId={user.uid} date={selectedDate.toISOString().split('T')[0]} mealType={currentMealType} closeModal={closeModal}/>
+    </View>
+  </View>
+</Modal>
+
     </ScrollView>
   );
 };
@@ -153,11 +128,6 @@ const DietScreen = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  itemContainer: {
-    margin: 10,
-    padding: 10,
-    backgroundColor: '#f0f0f0',
   },
   totalsContainer: {
     marginTop: 20,
@@ -167,6 +137,27 @@ const styles = StyleSheet.create({
   totalText: {
     fontWeight: 'bold',
   },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    width: '80%',
+    maxHeight: '80%',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+  },
+  closeButtonText: {
+    fontSize: 18,
+    color: 'blue',
+  },
 });
-
 export default DietScreen;
