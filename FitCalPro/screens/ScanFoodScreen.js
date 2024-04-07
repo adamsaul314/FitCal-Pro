@@ -3,64 +3,15 @@ import { View, Text, Button, StyleSheet, TextInput, Alert, Keyboard } from 'reac
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { useNavigation } from '@react-navigation/native';
 import { getAuth } from 'firebase/auth';
-import { firestore } from '../firebase';
-import { collection, addDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
 
-const calculateAndAddToDiet = async () => {
-  if (!consumedWeight) {
-    Alert.alert('Please enter the weight of the food you are consuming.');
-    return;
-  }
-  
-  // Check for a logged-in user
-  const user = getAuth().currentUser;
-  if (!user) {
-    Alert.alert('User not logged in', 'Please log in to continue.');
-    return;
-  }
-  const userId = user.uid;
-
-  const weightFactor = parseFloat(consumedWeight) / 100;
-  const nutritionalInfo = {
-    productName: foodData.productName,
-    carbs: foodData.carbs * weightFactor,
-    protein: foodData.protein * weightFactor,
-    fat: foodData.fat * weightFactor,
-    kcal: foodData.kcal * weightFactor,
-  };
-
-  // Add the current date in YYYY-MM-DD format
-  const date = new Date().toISOString().split('T')[0];
-
-  // Log the food to Firestore
-  try {
-    await addDoc(collection(firestore, 'loggedFoods'), {
-      userId,
-      productName: nutritionalInfo.productName,
-      carbs: nutritionalInfo.carbs,
-      protein: nutritionalInfo.protein,
-      fat: nutritionalInfo.fat,
-      kcal: nutritionalInfo.kcal,
-      consumedWeight,
-      date,
-    });
-    Alert.alert('Success', 'Food added to your log.');
-    navigation.navigate('DietScreen', { nutritionalInfo });
-  } catch (error) {
-    console.error('Error logging food:', error);
-    Alert.alert('Error logging food', error.message);
-  }
-
-  Keyboard.dismiss();
-};
-
-
-const ScanFoodScreen = () => {
+const ScanFoodScreen = ({ route }) => {
   const [hasPermission, setHasPermission] = useState(null);
   const navigation = useNavigation();
   const [scanned, setScanned] = useState(false);
   const [foodData, setFoodData] = useState(null);
   const [consumedWeight, setConsumedWeight] = useState('');
+  const { mealType } = route.params; // mealType received from navigation parameter
 
   useEffect(() => {
     (async () => {
@@ -84,7 +35,7 @@ const ScanFoodScreen = () => {
           carbs: nutriments.carbohydrates_100g || 0,
           protein: nutriments.proteins_100g || 0,
           fat: nutriments.fat_100g || 0,
-          kcal: nutriments.energy_value || 0, // Ensure this key exists or use a fallback key
+          kcal: nutriments.energy_value || 0, // Adjusted for kcal value
         });
         setScanned(true);
       } else {
@@ -105,13 +56,14 @@ const ScanFoodScreen = () => {
       Alert.alert('Please enter the weight of the food you are consuming.');
       return;
     }
-    
-    // Check for a logged-in user
-    const user = getAuth().currentUser;
+  
+    const auth = getAuth();
+    const user = auth.currentUser;
     if (!user) {
       Alert.alert('User not logged in', 'Please log in to continue.');
       return;
     }
+    const db = getFirestore();
     const userId = user.uid;
   
     const weightFactor = parseFloat(consumedWeight) / 100;
@@ -123,23 +75,18 @@ const ScanFoodScreen = () => {
       kcal: foodData.kcal * weightFactor,
     };
   
-    // Add the current date in YYYY-MM-DD format
     const date = new Date().toISOString().split('T')[0];
   
-    // Log the food to Firestore
     try {
-      await addDoc(collection(firestore, 'loggedFoods'), {
+      await addDoc(collection(db, 'loggedFoods'), {
         userId,
-        productName: nutritionalInfo.productName,
-        carbs: nutritionalInfo.carbs,
-        protein: nutritionalInfo.protein,
-        fat: nutritionalInfo.fat,
-        kcal: nutritionalInfo.kcal,
-        consumedWeight,
+        mealType,
         date,
+        ...nutritionalInfo,
+        consumedWeight: parseFloat(consumedWeight),
       });
       Alert.alert('Success', 'Food added to your log.');
-      navigation.navigate('DietScreen', { nutritionalInfo });
+      navigation.goBack(); // Changed to goBack for returning to the previous screen
     } catch (error) {
       console.error('Error logging food:', error);
       Alert.alert('Error logging food', error.message);
@@ -147,7 +94,6 @@ const ScanFoodScreen = () => {
   
     Keyboard.dismiss();
   };
-  
 
   return (
     <View style={styles.container}>
@@ -169,12 +115,11 @@ const ScanFoodScreen = () => {
                 {foodData ? `Product Name: ${foodData.productName}` : 'Scan a barcode to start'}
               </Text>
               <Text style={styles.infoText}>
-                {foodData ? `Serving Size: ${foodData.productQuantity}` : ''}
+                {foodData ? `Serving Size: ${foodData.productQuantity}g` : ''}
               </Text>
-              {/* Input for the consumed weight */}
               <TextInput
                 style={styles.input}
-                onChangeText={text => setConsumedWeight(text)}
+                onChangeText={setConsumedWeight}
                 value={consumedWeight}
                 placeholder="Enter weight in grams"
                 keyboardType="numeric"
@@ -209,7 +154,7 @@ const styles = StyleSheet.create({
     margin: 12,
     borderWidth: 1,
     padding: 10,
-    width: '80%', // Adjust as necessary
+    width: '80%',
   },
 });
 

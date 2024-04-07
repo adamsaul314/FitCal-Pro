@@ -84,7 +84,7 @@ import AddFoodForm from './components/addFoodForm';
  const HomeTabs = () => {
    return (
      <Tab.Navigator>
-       <Tab.Screen name="DietScreen" component={DietScreen} />
+       <Tab.Screen name="Diet" component={DietScreen} />
        <Tab.Screen name="Scan" component={ScanFoodScreen}/>
        <Tab.Screen name="Profile" component={ProfileScreen} />
      </Tab.Navigator>

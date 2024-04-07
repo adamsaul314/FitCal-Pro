@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, Button, Modal, TouchableOpacity } from 'react-native';
 import { getAuth } from 'firebase/auth';
-import { firestore } from '../firebase';
-import { collection, query, where, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
+import { getFirestore, collection, query, where, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import DateSelector from '../components/dateSelector';
-import { getFirestore } from 'firebase/firestore';
 import MealTypeSection from '../components/MealTypeSection';
 import AddFoodForm from '../components/addFoodForm';
 import { useNavigation } from '@react-navigation/native';
@@ -20,15 +18,22 @@ const DietScreen = ({ route }) => {
     setIsFormVisible(false);
   };
 
+  const totals = loggedItems.reduce(
+    (acc, item) => ({
+      carbs: acc.carbs + item.carbs,
+      protein: acc.protein + item.protein,
+      fat: acc.fat + item.fat,
+      kcal: acc.kcal + item.kcal,
+    }),
+    { carbs: 0, protein: 0, fat: 0, kcal: 0 }
+  );
+
+  const db = getFirestore();
   const auth = getAuth();
   const user = auth.currentUser;
   const navigation = useNavigation();
 
   useEffect(() => {
-    const auth = getAuth();
-    const db = getFirestore();
-    const user = auth.currentUser;
-  
     if (user) {
       // Fetching logged foods
       const fetchLoggedFoodsForDate = (date) => {
@@ -73,12 +78,12 @@ const DietScreen = ({ route }) => {
 
   const handleScanFood = (mealType) => {
     console.log(`Scan Food For ${mealType}`);
-    navigation.navigate('Scan');
+    navigation.navigate('Scan', {mealType});
   };
 
   const removeItem = async (itemId) => {
     try {
-      await deleteDoc(doc(firestore, "loggedFoods", itemId));
+      await deleteDoc(doc(db, "loggedFoods", itemId));
       // Filter out the removed item from the loggedItems state
       const updatedItems = loggedItems.filter(item => item.id !== itemId);
       setLoggedItems(updatedItems); // Update the state with the filtered items
@@ -87,15 +92,15 @@ const DietScreen = ({ route }) => {
     }
   };
 
-  const totals = loggedItems.reduce(
-    (acc, item) => ({
-      carbs: acc.carbs + item.carbs,
-      protein: acc.protein + item.protein,
-      fat: acc.fat + item.fat,
-      kcal: acc.kcal + item.kcal,
-    }),
-    { carbs: 0, protein: 0, fat: 0, kcal: 0 }
-  );
+  // const totals = loggedItems.reduce(
+  //   (acc, item) => ({
+  //     carbs: acc.carbs + item.carbs,
+  //     protein: acc.protein + item.protein,
+  //     fat: acc.fat + item.fat,
+  //     kcal: acc.kcal + item.kcal,
+  //   }),
+  //   { carbs: 0, protein: 0, fat: 0, kcal: 0 }
+  // );
 
   return (
     <ScrollView style={styles.container}>
