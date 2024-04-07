@@ -7,6 +7,7 @@ import DateSelector from '../components/dateSelector';
 import { getFirestore } from 'firebase/firestore';
 import MealTypeSection from '../components/MealTypeSection';
 import AddFoodForm from '../components/addFoodForm';
+import { useNavigation } from '@react-navigation/native';
 
 const DietScreen = ({ route }) => {
   const [loggedItems, setLoggedItems] = useState([]);
@@ -21,6 +22,7 @@ const DietScreen = ({ route }) => {
 
   const auth = getAuth();
   const user = auth.currentUser;
+  const navigation = useNavigation();
 
   useEffect(() => {
     const auth = getAuth();
@@ -71,6 +73,7 @@ const DietScreen = ({ route }) => {
 
   const handleScanFood = (mealType) => {
     console.log(`Scan Food For ${mealType}`);
+    navigation.navigate('Scan');
   };
 
   const removeItem = async (itemId) => {
