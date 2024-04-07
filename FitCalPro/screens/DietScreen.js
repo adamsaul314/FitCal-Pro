@@ -134,39 +134,82 @@ const DietScreen = ({ route }) => {
   );
 };
 
+// Updated StyleSheet for DietScreen
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f2f2f2', // Consistent background color
   },
   totalsContainer: {
-    marginTop: 20,
-    padding: 10,
-    backgroundColor: '#ddd',
+    margin: 10,
+    padding: 20,
+    borderRadius: 10,
+    backgroundColor: '#FFF', // Card-like design for totals
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4,
   },
   totalText: {
     fontWeight: 'bold',
+    color: '#333', // Improved readability
+    marginBottom: 5,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333', // Section titles similar to HomeScreen
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  mealTypeSection: {
+    margin: 10,
+    padding: 20,
+    borderRadius: 10,
+    backgroundColor: '#FFF', // Use card design for each meal type
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.23,
+    shadowRadius: 2.62,
+    elevation: 4,
   },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    marginTop: '50%',
   },
   modalContent: {
     backgroundColor: '#fff',
-    borderRadius: 10,
+    borderRadius: 20,
     padding: 20,
-    width: '80%',
-    maxHeight: '80%',
+    alignItems: 'center',
+    width: '90%', // Adjusted for better layout
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   closeButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
+    alignSelf: 'flex-end',
+    padding: 10,
   },
   closeButtonText: {
-    fontSize: 18,
-    color: 'blue',
+    fontSize: 16,
+    color: '#007bff', // Keeping it consistent with the button color
   },
 });
+
+
 export default DietScreen;

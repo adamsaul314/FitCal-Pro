@@ -1,63 +1,106 @@
 import React from 'react';
-import { View, Text, StyleSheet, Button, ScrollView } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const MealTypeSection = ({ mealType, onAddFood, onScanFood, loggedItems, removeItem }) => {
+  const renderItem = ({ item }) => (
+    <View style={styles.loggedItem}>
+      <Icon name="food" size={20} color="#007bff" />
+      <View style={styles.itemDetails}>
+        <Text style={styles.itemName}>{item.productName}</Text>
+        <Text style={styles.itemInfo}>Carbs: {item.carbs}g | Protein: {item.protein}g | Fat: {item.fat}g | Kcal: {item.kcal}</Text>
+      </View>
+      <TouchableOpacity onPress={() => removeItem(item.id)} style={styles.removeButton}>
+        <Icon name="trash-can-outline" size={20} color="#ff6347" />
+      </TouchableOpacity>
+    </View>
+  );
+
   return (
-    <View style={styles.mealTypeContainer}>
-      <Text style={styles.mealTypeTitle}>{mealType}</Text>
-      {/* Display Logged Items */}
-      <ScrollView style={styles.loggedItemsContainer} nestedScrollEnabled={true}>
-        {loggedItems.map((item, index) => (
-          <View key={index} style={styles.loggedItem}>
-            <Text style={styles.itemText}>Product Name: {item.productName}</Text>
-            <Text style={styles.itemText}>Carbs: {item.carbs.toFixed(2)}g</Text>
-            <Text style={styles.itemText}>Protein: {item.protein.toFixed(2)}g</Text>
-            <Text style={styles.itemText}>Fat: {item.fat.toFixed(2)}g</Text>
-            <Text style={styles.itemText}>Kcal: {item.kcal.toFixed(2)}</Text>
-            <Button title="Remove" onPress={() => removeItem(item.id)} />
-            {/* Add a remove or edit button if necessary */}
-          </View>
-        ))}
-      </ScrollView>
-      <View style={styles.mealTypeButtons}>
-        <Button title="Add Food" onPress={onAddFood} />
-        <Icon.Button name="camera" backgroundColor="#3b5998" onPress={onScanFood}>
-          Scan
-        </Icon.Button>
+    <View style={styles.container}>
+      <Text style={styles.title}>{mealType}</Text>
+      <FlatList
+        data={loggedItems}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => index.toString()}
+        horizontal={false}
+        showsVerticalScrollIndicator={false}
+      />
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity onPress={onAddFood} style={[styles.button, styles.addButton]}>
+          <Icon name="plus" size={20} color="white" />
+          <Text style={styles.buttonText}>Add Food</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={onScanFood} style={[styles.button, styles.scanButton]}>
+          <Icon name="barcode-scan" size={20} color="white" />
+          <Text style={styles.buttonText}>Scan</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  mealTypeContainer: {
-    marginVertical: 10,
-    paddingHorizontal: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
+  container: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 8,
+    marginVertical: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  mealTypeTitle: {
+  title: {
     fontSize: 18,
     fontWeight: 'bold',
+    color: '#007bff',
+    marginBottom: 16,
+  },
+  loggedItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f9f9f9',
+    padding: 10,
+    borderRadius: 8,
     marginBottom: 10,
   },
-  mealTypeButtons: {
+  itemDetails: {
+    flex: 1,
+    marginLeft: 10,
+  },
+  itemName: {
+    fontWeight: 'bold',
+  },
+  itemInfo: {
+    color: '#666',
+  },
+  removeButton: {
+    marginLeft: 10,
+  },
+  buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: 10,
   },
-  loggedItemsContainer: {
-    maxHeight: 200, // Set a max height for scrollable area
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
   },
-  loggedItem: {
-    padding: 5,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
+  addButton: {
+    backgroundColor: '#28a745',
   },
-  itemText: {
-    fontSize: 14,
+  scanButton: {
+    backgroundColor: '#007bff',
+  },
+  buttonText: {
+    marginLeft: 10,
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 
