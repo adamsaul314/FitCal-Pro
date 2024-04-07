@@ -1,30 +1,38 @@
 import React, { useState } from 'react';
-import { View, Button } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 const DateSelector = ({ onDateSelected }) => {
   const [date, setDate] = useState(new Date());
-  const [show, setShow] = useState(false);
 
   const onChange = (event, selectedDate) => {
-    setShow(false);
-    setDate(selectedDate || date);
-    onDateSelected(selectedDate || date);
+    const currentDate = selectedDate || date;
+    setDate(currentDate);
+    onDateSelected(currentDate);
   };
 
   return (
-    <View>
-      <Button onPress={() => setShow(true)} title="Choose Date" />
-      {show && (
-        <DateTimePicker
-          value={date}
-          mode="date"
-          display="default"
-          onChange={onChange}
-        />
-      )}
+    <View style={styles.container}>
+      <DateTimePicker
+        value={date}
+        mode="date"
+        display="default"
+        onChange={onChange}
+        style={styles.picker}
+      />
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    // Style your container for the date picker here
+    padding: 10,
+    backgroundColor: '#fff', // Example background color
+  },
+  picker: {
+    // Style your date picker here
+  },
+});
 
 export default DateSelector;
