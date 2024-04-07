@@ -6,6 +6,7 @@ import DateSelector from '../components/dateSelector';
 import MealTypeSection from '../components/MealTypeSection';
 import AddFoodForm from '../components/addFoodForm';
 import { useNavigation } from '@react-navigation/native';
+import { useNutrition } from '../Context/NutritionContext';
 
 const DietScreen = ({ route }) => {
   const [loggedItems, setLoggedItems] = useState([]);
@@ -60,7 +61,7 @@ const DietScreen = ({ route }) => {
           console.log("No profile data found.");
         }
       });
-  
+
       const unsubscribeFoods = fetchLoggedFoodsForDate(selectedDate);
   
       // Cleanup function
