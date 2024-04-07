@@ -85,7 +85,7 @@ import AddFoodForm from './components/addFoodForm';
    return (
      <Tab.Navigator>
        <Tab.Screen name="Diet" component={DietScreen} />
-       <Tab.Screen name="Scan" component={ScanFoodScreen}/>
+     {/* <Tab.Screen name="Scan" component={ScanFoodScreen}/> */}
        <Tab.Screen name="Profile" component={ProfileScreen} />
      </Tab.Navigator>
    );
@@ -101,6 +101,7 @@ import AddFoodForm from './components/addFoodForm';
          <Stack.Screen name="WorkoutDetails" component={WorkoutDetailsScreen}  />
          <Stack.Screen name="HealthProfile" component={HealthProfileScreen} />
          <Stack.Screen name='AddFoodForm' component={AddFoodForm} />
+         <Stack.Screen name='Scan' component={ScanFoodScreen} />
        </Stack.Navigator>
      </NavigationContainer>
    );
