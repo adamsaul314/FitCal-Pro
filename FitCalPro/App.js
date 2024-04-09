@@ -14,6 +14,7 @@ import RegisterScreen from './screens/RegisterScreen';
 import ScanFoodScreen from './screens/ScanFoodScreen';
 import HealthProfileScreen from './screens/healthprofileScreen.js';
 import AddFoodForm from './components/addFoodForm';
+import { NutritionProvider } from './screens/NutritionContext.js';
 
 
  const Stack = createNativeStackNavigator();
@@ -47,6 +48,7 @@ import AddFoodForm from './components/addFoodForm';
  
  export default function App() {
    return (
+    <NutritionProvider>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Login">
           <Stack.Screen name="Login" component={LoginScreen} />
@@ -58,6 +60,7 @@ import AddFoodForm from './components/addFoodForm';
           <Stack.Screen name='Scan' component={ScanFoodScreen} />
         </Stack.Navigator>
       </NavigationContainer>
+      </NutritionProvider>
    );
  }
 const styles = StyleSheet.create({

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, ProgressBarAndroid, Alert } from 'react-native';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
+import { useNutrition } from './NutritionContext';
 
 
 const HomeScreen = () => {
@@ -18,6 +19,9 @@ const HomeScreen = () => {
   const [streaks, setStreaks] = useState(0);
   const [nutritionInsights, setNutritionInsights] = useState('');
   const [motivationalMessage, setMotivationalMessage] = useState('');
+
+  const { nutritionData } = useNutrition();
+  const { totals, calorieGoal } = nutritionData;
 
   
 
@@ -42,6 +46,7 @@ const HomeScreen = () => {
         <Text style={styles.title}>Daily Summary</Text>
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Calories</Text>
+          <Text>Total Carbs: {totals.carbs.toFixed(2)}g</Text>
             <View style={styles.progressCircleContainer}>
             <AnimatedCircularProgress
               size={120} // Diameter of the circle

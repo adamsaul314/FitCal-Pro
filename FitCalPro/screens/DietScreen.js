@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, Button, Modal, TouchableOpacity } from 'react-native';
 import { getAuth } from 'firebase/auth';
 import { getFirestore, collection, query, where, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
@@ -6,6 +6,7 @@ import DateSelector from '../components/dateSelector';
 import MealTypeSection from '../components/MealTypeSection';
 import AddFoodForm from '../components/addFoodForm';
 import { useNavigation } from '@react-navigation/native';
+import { useNutrition } from './NutritionContext';
 
 const DietScreen = ({ route }) => {
   const [loggedItems, setLoggedItems] = useState([]);
@@ -14,19 +15,18 @@ const DietScreen = ({ route }) => {
   const [isFormVisible, setIsFormVisible] = useState(false);
   const [currentMealType, setCurrentMealType] = useState('');
 
+  const { setNutritionData } = useNutrition();
+
   const closeModal = () => {
     setIsFormVisible(false);
   };
 
-  const totals = loggedItems.reduce(
-    (acc, item) => ({
-      carbs: acc.carbs + item.carbs,
-      protein: acc.protein + item.protein,
-      fat: acc.fat + item.fat,
-      kcal: acc.kcal + item.kcal,
-    }),
-    { carbs: 0, protein: 0, fat: 0, kcal: 0 }
-  );
+  const totals = useMemo(() => loggedItems.reduce((acc, item) => ({
+    carbs: acc.carbs + item.carbs,
+    protein: acc.protein + item.protein,
+    fat: acc.fat + item.fat,
+    kcal: acc.kcal + item.kcal,
+  }), { carbs: 0, protein: 0, fat: 0, kcal: 0 }), [loggedItems]);
 
   const db = getFirestore();
   const auth = getAuth();
@@ -70,6 +70,11 @@ const DietScreen = ({ route }) => {
       };
     }
   }, [selectedDate]); // Depend on selectedDate
+
+  useEffect(() => {
+    // Call this when totals or calorieGoal changes
+    setNutritionData({ totals, calorieGoal });
+  }, [totals, calorieGoal]);
   
   const handleAddFood = (mealType) => {
     setCurrentMealType(mealType);
