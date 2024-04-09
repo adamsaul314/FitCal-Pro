@@ -51,21 +51,21 @@ const HomeScreen = () => {
             <AnimatedCircularProgress
               size={120} // Diameter of the circle
               width={15} // Thickness of the progress line
-              fill={(dailySummary.caloriesConsumed / dailyGoals.calorieGoal) * 100} // Calculate the fill percentage
+              fill={(totals.kcal / calorieGoal) * 100} // Calculate the fill percentage
               tintColor="#00e0ff" // Color of the progress line
               backgroundColor="#3d5875" // Color of the remaining circle
             >
               {
                 (fill) => (
                   <Text style={styles.caloriesCount}>
-                    {dailySummary.caloriesConsumed} kcal
+                    {totals.kcal.toFixed(0)} kcal
                   </Text>
                 )
               }
             </AnimatedCircularProgress>
-              <Text style={styles.caloriesCount}>{dailySummary.caloriesConsumed} kcal</Text>
+              <Text style={styles.caloriesCount}>{totals.kcal.toFixed(0)} kcal</Text>
             </View>
-          <Text style={styles.goalText}>of {dailyGoals.calorieGoal} kcal goal</Text>
+          <Text style={styles.goalText}>of {calorieGoal.toFixed(0)} kcal goal</Text>
         </View>
       </View>
 
