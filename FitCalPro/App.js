@@ -38,8 +38,9 @@ import { NutritionProvider } from './screens/NutritionContext.js';
  const HomeTabs = () => {
    return (
      <Tab.Navigator>
-      <Tab.Screen name='Home' component={HomeScreen}/>
        <Tab.Screen name="Diet" component={DietScreen} />
+       <Tab.Screen name='Summary' component={HomeScreen}/>
+
      {/* <Tab.Screen name="Scan" component={ScanFoodScreen}/> */}
        <Tab.Screen name="Profile" component={ProfileScreen} />
      </Tab.Navigator>

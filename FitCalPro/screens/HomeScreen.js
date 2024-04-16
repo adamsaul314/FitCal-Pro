@@ -1,87 +1,128 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, ProgressBarAndroid, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, ProgressBarAndroid, Alert, Dimensions } from 'react-native';
 import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import { useNutrition } from './NutritionContext';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { PieChart } from 'react-native-chart-kit';
 
 
 const HomeScreen = () => {
 
-
-  const [dailySummary, setDailySummary] = useState({
-    caloriesConsumed: 0,
-    macroNutrients: { carbs: 0, protein: 0, fat: 0 },
-  });
-  const [dailyGoals, setDailyGoals] = useState({
-    calorieGoal: 2000,
-    proteinGoal: 50,
-    waterGoal: 8, // Liters
-  });
-  const [streaks, setStreaks] = useState(0);
-  const [nutritionInsights, setNutritionInsights] = useState('');
-  const [motivationalMessage, setMotivationalMessage] = useState('');
-
   const { nutritionData } = useNutrition();
   const { totals, calorieGoal } = nutritionData;
 
-  
+  const chartConfig = {
+    backgroundColor: '#ffffff',
+    backgroundGradientFrom: '#ffffff',
+    backgroundGradientTo: '#ffffff',
+    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+    style: {
+      borderRadius: 16,
+    },
+  };
 
-  // Placeholder for functions to fetch real data
-  useEffect(() => {
-    // Fetch daily summary, goals, and other info from backend or local storage
-    // Dummy data below
-    setDailySummary({
-      caloriesConsumed: 1200,
-      macroNutrients: { carbs: 100, protein: 55, fat: 30 },
-    });
-    setStreaks(5);
-    setNutritionInsights('You tend to consume more sodium on weekends.');
-    setMotivationalMessage('Great job! You’ve logged your meals for 30 consecutive days!');
-  }, []);
+  const data = [
+    {
+      name: 'Carbs',
+      population: totals.carbs,
+      color: '#FFA500',
+      legendFontColor: '#7F7F7F',
+      legendFontSize: 15,
+    },
+    {
+      name: 'Protein',
+      population: totals.protein,
+      color: '#00CED1',
+      legendFontColor: '#7F7F7F',
+      legendFontSize: 15,
+    },
+    {
+      name: 'Fat',
+      population: totals.fat,
+      color: '#DEB887',
+      legendFontColor: '#7F7F7F',
+      legendFontSize: 15,
+    },
+  ];
 
-  // Actual implementation would involve fetching data and calculating values
+
 
   return (
     <ScrollView style={styles.container}>
+      {/* Daily Summary Section */}
       <View style={styles.section}>
         <Text style={styles.title}>Daily Summary</Text>
+
         <View style={styles.card}>
           <Text style={styles.cardTitle}>Calories</Text>
-          <Text>Total Carbs: {totals.carbs.toFixed(2)}g</Text>
-            <View style={styles.progressCircleContainer}>
-            <AnimatedCircularProgress
-              size={120} // Diameter of the circle
-              width={15} // Thickness of the progress line
-              fill={(totals.kcal / calorieGoal) * 100} // Calculate the fill percentage
-              tintColor="#00e0ff" // Color of the progress line
-              backgroundColor="#3d5875" // Color of the remaining circle
-            >
-              {
-                (fill) => (
-                  <Text style={styles.caloriesCount}>
-                    {totals.kcal.toFixed(0)} kcal
-                  </Text>
-                )
-              }
-            </AnimatedCircularProgress>
-              <Text style={styles.caloriesCount}>{totals.kcal.toFixed(0)} kcal</Text>
-            </View>
+
+          <AnimatedCircularProgress
+            size={120}
+            width={15}
+            fill={(totals.kcal / calorieGoal) * 100}
+            tintColor="#00e0ff"
+            backgroundColor="#3d5875"
+          >
+            {(fill) => (
+              <Text style={styles.caloriesCount}>
+                {totals.kcal.toFixed(0)} kcal
+              </Text>
+            )}
+          </AnimatedCircularProgress>
+          
           <Text style={styles.goalText}>of {calorieGoal.toFixed(0)} kcal goal</Text>
         </View>
       </View>
 
-        
-      {/* Nutrition Insights */}
-        <View style={styles.section}>
-            <Text style={styles.title}>Nutrition Insights</Text>
-            <Text style={styles.text}>{nutritionInsights}</Text>
-            {/* Additional insights as necessary */}
+      {/* Nutrition Insights Section */}
+      <View style={styles.section}>
+        <Text style={styles.title}>Daily Nutrition Insights</Text>
+        <View style={styles.nutrientRow}>
+          
+          {/* Carbs */}
+        <View style={styles.card}>
+          <Icon name="corn" size={24} color="#FFA500" />
+          <Text style={styles.cardTitle}>Carbs</Text>
+          <Text style={styles.caloriesCount}>
+            {totals.carbs.toFixed(0)}g 
+          </Text>
         </View>
 
-      {/* Motivational Messages */}
-    <View style={styles.section}>
-        <Text style={styles.title}>Keep Going!</Text>
-        <Text style={styles.text}>{motivationalMessage}</Text>
-    </View>
+          {/* Protein */}
+          <View style={styles.card}>
+          <Icon name="fish" size={24} color="#00CED1" />
+          <Text style={styles.cardTitle}>Protein</Text>
+          <Text style={styles.caloriesCount}>
+            {totals.protein.toFixed(0)}g
+          </Text>
+        </View>
+
+          {/* Fat */}
+          <View style={styles.card}>
+          <Icon name="oil" size={24} color="#DEB887" />
+          <Text style={styles.cardTitle}>Fat</Text>
+          <Text style={styles.caloriesCount}>
+            {totals.fat.toFixed(0)}g
+          </Text>
+        </View>
+
+        </View>
+      </View>
+       {/* Calorie Breakdown */}
+       <Text style={styles.title}>Calorie Breakdown</Text>
+       <View style={styles.card}>
+      <PieChart
+          data={data}
+          width={Dimensions.get('window').width}
+          height={220}
+          chartConfig={chartConfig}
+          accessor={"population"}
+          backgroundColor={"transparent"}
+          paddingLeft={"15"}
+          center={[10,0]}
+          absolute
+        />
+        </View>
 
     </ScrollView>
   );
@@ -99,35 +140,24 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
-  text: {
-    fontSize: 14,
-  },
-  progressBar: {
-    height: 20,
-    backgroundColor: 'grey',
-    borderRadius: 10,
-    overflow: 'hidden',
-  },
-  progress: {
-    height: '100%',
-    borderRadius: 10,
-  },
-
-  card: {
+  nutrientRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     alignItems: 'center',
+  },
+  card: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
     margin: 10,
-    padding: 20,
+    padding: 10,
     borderRadius: 10,
     backgroundColor: '#FFF',
-    // Add shadow or elevation for depth
   },
   cardTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 8,
-  },
-  progressCircleContainer: {
-    // Container styles for the circular progress bar
   },
   caloriesCount: {
     fontSize: 24,
