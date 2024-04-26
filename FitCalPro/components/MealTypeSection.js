@@ -8,7 +8,7 @@ const MealTypeSection = ({ mealType, onAddFood, onScanFood, loggedItems, removeI
       <Icon name="food" size={20} color="#007bff" />
       <View style={styles.itemDetails}>
         <Text style={styles.itemName}>{item.productName}</Text>
-        <Text style={styles.itemInfo}>Carbs: {item.carbs}g | Protein: {item.protein}g | Fat: {item.fat}g | Kcal: {item.kcal}</Text>
+        <Text style={styles.itemInfo}>Carbs: {item.carbs.toFixed(0)}g | Protein: {item.protein.toFixed(0)}g | Fat: {item.fat.toFixed(0)}g | Kcal: {item.kcal.toFixed(0)}</Text>
       </View>
       <TouchableOpacity onPress={() => removeItem(item.id)} style={styles.removeButton}>
         <Icon name="trash-can-outline" size={20} color="#ff6347" />

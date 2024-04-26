@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Button, StyleSheet, TextInput, Alert, Keyboard } from 'react-native';
+import {
+  View,
+  Text,
+  Button,
+  StyleSheet,
+  TextInput,
+  Alert,
+  Keyboard,
+  TouchableWithoutFeedback
+} from 'react-native';
 import { BarCodeScanner } from 'expo-barcode-scanner';
 import { useNavigation } from '@react-navigation/native';
 import { getAuth } from 'firebase/auth';
@@ -35,7 +44,7 @@ const ScanFoodScreen = ({ route }) => {
           carbs: nutriments.carbohydrates_100g || 0,
           protein: nutriments.proteins_100g || 0,
           fat: nutriments.fat_100g || 0,
-          kcal: nutriments.energy_value || 0, // Adjusted for kcal value
+          kcal: nutriments.energy_value || 0,
         });
         setScanned(true);
       } else {
@@ -56,7 +65,7 @@ const ScanFoodScreen = ({ route }) => {
       Alert.alert('Please enter the weight of the food you are consuming.');
       return;
     }
-  
+
     const auth = getAuth();
     const user = auth.currentUser;
     if (!user) {
@@ -65,7 +74,7 @@ const ScanFoodScreen = ({ route }) => {
     }
     const db = getFirestore();
     const userId = user.uid;
-  
+
     const weightFactor = parseFloat(consumedWeight) / 100;
     const nutritionalInfo = {
       productName: foodData.productName,
@@ -74,9 +83,9 @@ const ScanFoodScreen = ({ route }) => {
       fat: foodData.fat * weightFactor,
       kcal: foodData.kcal * weightFactor,
     };
-  
+
     const date = new Date().toISOString().split('T')[0];
-  
+
     try {
       await addDoc(collection(db, 'loggedFoods'), {
         userId,
@@ -91,46 +100,48 @@ const ScanFoodScreen = ({ route }) => {
       console.error('Error logging food:', error);
       Alert.alert('Error logging food', error.message);
     }
-  
+
     Keyboard.dismiss();
   };
 
   return (
-    <View style={styles.container}>
-      {hasPermission === null ? (
-        <Text>Requesting camera permission</Text>
-      ) : hasPermission === false ? (
-        <Text>No access to camera</Text>
-      ) : (
-        <>
-          {!scanned && (
-            <BarCodeScanner
-              onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-              style={StyleSheet.absoluteFillObject}
-            />
-          )}
-          {scanned && (
-            <View style={styles.infoContainer}>
-              <Text style={styles.infoText}>
-                {foodData ? `Product Name: ${foodData.productName}` : 'Scan a barcode to start'}
-              </Text>
-              <Text style={styles.infoText}>
-                {foodData ? `Serving Size: ${foodData.productQuantity}g` : ''}
-              </Text>
-              <TextInput
-                style={styles.input}
-                onChangeText={setConsumedWeight}
-                value={consumedWeight}
-                placeholder="Enter weight in grams"
-                keyboardType="numeric"
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <View style={styles.container}>
+        {hasPermission === null ? (
+          <Text>Requesting camera permission</Text>
+        ) : hasPermission === false ? (
+          <Text>No access to camera</Text>
+        ) : (
+          <>
+            {!scanned && (
+              <BarCodeScanner
+                onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
+                style={StyleSheet.absoluteFillObject}
               />
-              <Button title="Add to Diet" onPress={calculateAndAddToDiet} />
-              <Button title="Scan Another" onPress={() => setScanned(false)} />
-            </View>
-          )}
-        </>
-      )}
-    </View>
+            )}
+            {scanned && (
+              <View style={styles.infoContainer}>
+                <Text style={styles.infoText}>
+                  {foodData ? `Product Name: ${foodData.productName}` : 'Scan a barcode to start'}
+                </Text>
+                <Text style={styles.infoText}>
+                  {foodData ? `Serving Size: ${foodData.productQuantity}g` : ''}
+                </Text>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={setConsumedWeight}
+                  value={consumedWeight}
+                  placeholder="Enter weight in grams"
+                  keyboardType="numeric"
+                />
+                <Button title="Add to Diet" onPress={calculateAndAddToDiet} />
+                <Button title="Scan Another" onPress={() => setScanned(false)} />
+              </View>
+            )}
+          </>
+        )}
+      </View>
+    </TouchableWithoutFeedback>
   );
 };
 
