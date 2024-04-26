@@ -16,7 +16,6 @@ import HealthProfileScreen from './screens/healthprofileScreen.js';
 import AddFoodForm from './components/addFoodForm';
 import { NutritionProvider } from './screens/NutritionContext.js';
 
-
  const Stack = createNativeStackNavigator();
  const Tab = createBottomTabNavigator();
  
